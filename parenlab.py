@@ -38,6 +38,11 @@ def compute(paren):
             return (-1, 0, 0, 1, 0)
     else:
         left, right = Seq.splitMid(paren)
+        # Could spawn two procs
+        # One for each and wait for them to complete.
+        # What is going to happen # processes ~ 1000
+        # What is going to happen when this function gets called
+        # from another.
         lres, rres = compute(left), compute(right)
         return merge(lres, rres, Seq.length(left))
 

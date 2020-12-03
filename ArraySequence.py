@@ -133,7 +133,7 @@ class ArraySeq(object):
     def _tabulate(self, f, n, force_sequential=False):
         seq_type = ctypes.c_wchar_p if isinstance(f(0), str) else "i"
 
-        if n < GRANULAR or force_sequential:
+        if n < GRAIN or force_sequential:
             self.arr = Array(seq_type, [f(i) for i in range(n)], lock=False)
         else:
             result_shared = Array(seq_type, n, lock=False)
@@ -193,7 +193,7 @@ class ArraySeq(object):
             raise Exception("Injection sequence cannot be empty")
         elif any([(num < 0 or num >= len(self.arr)) for num in inject_pos]):
             raise Exception("Index out of bound")
-        elif n < GRANULAR:
+        elif n < GRAIN:
             result_shared = Array(seq_type, len(self.arr), lock=False)
             for i, num in enumerate(self.arr):
                 result_shared[i] = num
@@ -225,7 +225,7 @@ class ArraySeq(object):
         if not (1 <= n <= len(self.arr)) or not (0 <= start_idx < len(self.arr)) or not((start_idx + n) <= len(self.arr)):
             raise Exception("Index out of bound")
 
-        if n < GRANULAR:
+        if n < GRAIN:
             return ArraySeq(SHARED_ARRAY, self.arr[start_idx:start_idx+n])
         
         segment_len = math.ceil(n / NUM_PROCESSORS)
@@ -268,7 +268,7 @@ class ArraySeq(object):
         n = len(self.arr)
         processes = []
 
-        if n < GRANULAR or force_sequential:
+        if n < GRAIN or force_sequential:
             return self._filter_sequential(f)
 
         arr_form = ArraySeq.toArray(self)
@@ -327,7 +327,7 @@ class ArraySeq(object):
         n = len(self.arr)
         processes = []
 
-        if n < GRANULAR or force_sequential:
+        if n < GRAIN or force_sequential:
             return self._filterIdx_sequential(f)
 
         arr_form = ArraySeq.toArray(self)
@@ -362,7 +362,7 @@ class ArraySeq(object):
         prefs = Array(seq_type, len(S.arr), lock=False)
 
         array_native = ArraySeq.toArray(S)
-        if len(S.arr) < GRANULAR or force_sequential:
+        if len(S.arr) < GRAIN or force_sequential:
             S._scanIncl_sequential(prefs, array_native, f, b, 0, len(S.arr)) 
         else:
             S._scanIncl_parallel(prefs, array_native, f, b, 0, len(S.arr))
@@ -375,7 +375,7 @@ class ArraySeq(object):
             cur = prefs[i]
 
     def _scanIncl_parallel(self, prefs, array_native, f, b, low, high):
-        if (high - low) <= GRANULAR:
+        if (high - low) <= GRAIN:
             self._scanIncl_sequential(prefs, array_native, f, b, low, high)
         else:
             processes = []

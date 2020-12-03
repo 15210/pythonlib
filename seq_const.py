@@ -6,5 +6,5 @@ SINGLETON = "singleton"
 TABULATE = "tabulate"
 EMPTY = "empty"
 SHARED_ARRAY = "shared_array"
-GRANULAR =  10000
+GRAIN =  10000
 NUM_PROCESSORS = multiprocessing.cpu_count()
